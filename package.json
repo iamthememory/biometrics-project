@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/iamthememory/biometrics-project/issues"
   },
-  "homepage": "https://github.com/iamthememory/biometrics-project#readme"
+  "homepage": "https://github.com/iamthememory/biometrics-project#readme",
+  "dependencies": {
+    "VoiceIt": "^1.2.9"
+  }
 }
