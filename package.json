@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/iamthememory/biometrics-project#readme",
   "dependencies": {
-    "VoiceIt": "^1.2.9"
+    "VoiceIt": "^1.2.9",
+    "commander": "^2.15.1"
   }
 }
