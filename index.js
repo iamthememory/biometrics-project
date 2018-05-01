@@ -1,8 +1,15 @@
 #!/usr/bin/env node
 
-var program = require('commander')
-var voiceit = require('VoiceIt')
-var prompt = require('prompt')
+var program = require('commander');
+var voiceit = require('VoiceIt');
+var prompt = require('prompt');
+var fs = require('fs');
+var record = require('node-record-lpcm16');
+var tmp = require('tmp');
+var path = require('path');
+var play = require('audio-play');
+var load = require('audio-loader');
+var crypto = require('crypto');
 
 program
   .version('0.0.1')
@@ -12,7 +19,42 @@ program
 
 voiceit.initialize('e99d90d2807044a9b0eb08c53422ebfd')
 
+var tmpdir = tmp.dirSync({prefix: 'biomet-'});
+
 //------------------------Program-------------------------------
+
+function record_audio(msg, fname, func) {
+  console.log(msg);
+
+  var file = fs.createWriteStream(fname, {encoding: 'binary'});
+
+  record.start({
+    sampleRate: 44100,
+    verbose: true
+  }).pipe(file);
+
+  file.on('finish', func);
+}
+
+function record_phrase(func) {
+  var phrase = 'Never forget tomorrow is a new day';
+  var msg = 'Say "' + phrase + '"';
+
+  var fname = tmp.tmpNameSync({
+    template: path.join(tmpdir.name, 'XXXXXXX.wav')
+  });
+
+  record_audio(msg, fname, func.bind({fname: fname}));
+}
+
+function playfile(fname) {
+  if (typeof(fname) === 'undefined') {
+    fname = this.fname;
+  }
+
+  console.log("Playing ", fname);
+  load(fname).then(play);
+}
 
 function getpassword(func) {
   //get user password
@@ -27,38 +69,41 @@ function getpassword(func) {
   };
 
   prompt.start()
-  prompt.get(['password'], function (err, result) {
-    console.log('Got password: ', result.password);
-    func(result.password);
+  prompt.get(schema, function (err, result) {
+    var hash = crypto.createHash('sha256');
+    hash.update(result.password);
+    var passhash = hash.digest('hex');
+    func(result.password, passhash);
   });
 }
 
+record_phrase(playfile);
 
 init();
 
 //------------------------Custom Functions-----------------------
 
 function init(){
-  if (program.enroll) {
+  if (program.enroll !== undefined) {
     // node index.js -e <userid>
-    createEnrollment()
+    createEnrollment(program.enroll)
   }
   else if (program.authenticate) {
     //  authenticate
   }
-  else if (program.delete){
+  else if (program.delete) {
     //delete
   }
-  else if (program.getUser){
+  else if (program.getUser) {
     //get User
   }
-  else if (program.getEnrollment){
+  else if (program.getEnrollment) {
 
   }
-  else if (program.getEntrollments){
+  else if (program.getEnrollments) {
 
   }
-  else if (program.deleteEnrol){
+  else if (program.deleteEnroll) {
 
   }
   else {
@@ -134,46 +179,46 @@ function deleteEnrollment(userid, password, enrollmentid) {
     password: password,
     enrollmentId: enrollmentid,
     callback: function(response){
+      // FIXME: Add stuff
       console.log("Deleted enrollment: ", response);
     }
   });
 }
 
 
-function getEntrollments(userid, password) {
+function getEnrollments(userid, password) {
   myVoiceIt.getEnrollments({
     userId: userid,
     password: password,
     callback: function(response) {
-      //ADD CUSTOM CODE HERE TO USE
-      //DATA RECEIVED IN THE response VARIABLE
-      console.log("The Server Responded with the JSON: ",response);
+      // FIXME: Add stuff
+      console.log("Got enrollments: ",response);
     }
   });
 
 }
 
 //-----------------------Authentication rest api calls---------------------
-function authentication(userid, password) {
+function authentication(userid, password, wavpath) {
   myVoiceIt.authentication({
     userId: userid,
     password: password,
-    pathToAuthenticationWav: '/home/users/username/voicePrint.wav',
+    pathToAuthenticationWav: wavpath,
     contentLanguage: 'en-US',
-    callback: function(response){
-      console.log("The Response Was ",response);
+    callback: function(response) {
+      console.log("Authentication result: ", response);
     }
   });
 }
 
-function authenticationByWavURL(userid, password) {
+function authenticationByWavURL(userid, password, wavurl) {
   myVoiceIt.authenticationByWavURL({
     userId: userid,
     password: password,
-    urlToAuthenticationWav: 'https://voiceit.tech/voicePrint.wav',
+    urlToAuthenticationWav: wavurl,
     contentLanguage: 'en-US',
     callback: function(response) {
-      console.log("The Response Was ", response);
+      console.log("Authentication result: ", response);
     }
   });
 }

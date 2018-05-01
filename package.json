@@ -18,7 +18,13 @@
   "homepage": "https://github.com/iamthememory/biometrics-project#readme",
   "dependencies": {
     "VoiceIt": "^1.2.9",
+    "audio-loader": "^1.0.3",
+    "audio-play": "^2.2.0",
     "commander": "^2.15.1",
-    "prompt": "^1.0.0"
+    "fs": "0.0.1-security",
+    "node-record-lpcm16": "^0.3.0",
+    "path": "^0.12.7",
+    "prompt": "^1.0.0",
+    "tmp": "0.0.33"
   }
 }
