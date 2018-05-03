@@ -25,6 +25,7 @@
     "node-record-lpcm16": "^0.3.0",
     "path": "^0.12.7",
     "prompt": "^1.0.0",
-    "tmp": "0.0.33"
+    "tmp": "0.0.33",
+    "voiceit2-nodejs": "^1.0.2"
   }
 }

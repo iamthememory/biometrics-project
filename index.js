@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var program = require('commander');
-var voiceit = require('VoiceIt');
+var voiceit2 = require('voiceit2-nodejs');
 var prompt = require('prompt');
 var fs = require('fs');
 var record = require('node-record-lpcm16');
@@ -17,7 +17,17 @@ program
   .option('-a, --authenticate <userid>', 'Authenticate user')
   .parse(process.argv);
 
-voiceit.initialize('e99d90d2807044a9b0eb08c53422ebfd')
+let voiceit = new voiceit2(
+  "API_KEY",
+  "API_TOKEN",
+);
+
+var phrases = [
+  'Remember to wash your hands before eating',
+  'Zoos are filled with small and large animals',
+  'Never forget tomorrow is a new day',
+  'Today is a nice day to go for a walk',
+]
 
 var tmpdir = tmp.dirSync({prefix: 'biomet-'});
 
@@ -208,7 +218,7 @@ function authentication(userid, password, wavpath) {
     callback: function(response) {
       console.log("Authentication result: ", response);
     }
-  });
+  });Have the Answer
 }
 
 function authenticationByWavURL(userid, password, wavurl) {
