@@ -83,6 +83,16 @@ def make_argparser():
         help="Verify the user's face and voice",
     )
 
+    # I don't have a working webcam on my laptop at the moment, so let's just
+    # accept a file.
+    parser.add_argument(
+        '-f',
+        '--video-file',
+        type=argparse.FileType('rb'),
+        metavar='VIDEO',
+        help="A <5 second mp4 video of the user's face",
+    )
+
     return parser
 
 
@@ -117,6 +127,35 @@ def savedata(data):
     json.dump(data, open('data.json', 'w'))
 
 
+def verifyface(
+        userid,
+        video,
+    ):
+
+    r = requests.post(
+        'https://api.voiceit.io/verification/face',
+        headers=headers(),
+        data={
+            'userId': userid,
+            'doBlinkDetection': True,
+        },
+        files={
+            'video': video,
+        }
+    ).json()
+
+    success = r['responseCode'] == 'SUCC'
+
+    print(' - Blinks: %s' % r['blinksCount'])
+
+    if success:
+        print('Verified face with confidence', r['faceConfidence'])
+    else:
+        print('Failed face with confidence', r['faceConfidence'])
+
+    return success
+
+
 def verifyvoice(
         userid,
         recording,
@@ -142,6 +181,31 @@ def verifyvoice(
         print('Failed voice with confidence', r['confidence'])
 
     return success
+
+
+def enrollface(
+        userid,
+        video,
+    ):
+
+    r = requests.post(
+        'https://api.voiceit.io/enrollments/face',
+        headers=headers(),
+        data={
+            'userId': userid,
+            'doBlinkDetection': True,
+        },
+        files={
+            'video': video,
+        },
+    ).json()
+
+    if r['responseCode'] != 'SUCC':
+        print(r)
+        raise ValueError('Failed to enroll user: %s' % r['message'])
+    else:
+        print('Successfully enrolled face!')
+        print(' - Blinks: "%s"' % r['blinksCount'])
 
 
 def enrollvoice(
@@ -222,6 +286,10 @@ def main():
         print('Created user %s with ID %s' % (uname, newid))
 
     if args.enroll_user:
+
+        if not args.video_file:
+            sys.exit('No video file specified')
+
         uname = args.enroll_user
         uid = data['users'].get(uname, None)
 
@@ -233,9 +301,15 @@ def main():
             for x in range(3):
                 enrollphrase(uid, phrase)
 
-        # FIXME: Enroll face.
+        # Enroll face.
+        enrollface(uid, args.video_file)
+        args.video_file.seek(0)
 
     if args.verify_user:
+
+        if not args.video_file:
+            sys.exit('No video file specified')
+
         uname = args.verify_user
         uid = data['users'].get(uname, None)
 
@@ -248,6 +322,10 @@ def main():
 
             if not verifyvoice(uid, f):
                 sys.exit('Failed to verify user!')
+
+        # Verify face.
+        if not verifyface(uid, args.video_file):
+            sys.exit('Failed to verify user!')
 
     savedata(data)
 

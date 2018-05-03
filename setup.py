@@ -112,12 +112,14 @@ setup(
     py_modules=[],
     tests_require=[
         'pyaudio',
+        'pocketsphinx',
         'requests',
         'SpeechRecognition',
         'tox',
     ],
     install_requires=[
         'pyaudio',
+        'pocketsphinx',
         'requests',
         'SpeechRecognition',
     ],
