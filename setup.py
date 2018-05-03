@@ -111,11 +111,15 @@ setup(
     packages=['biometricsthing'],
     py_modules=[],
     tests_require=[
-        'tox',
+        'pyaudio',
         'requests',
+        'SpeechRecognition',
+        'tox',
     ],
     install_requires=[
+        'pyaudio',
         'requests',
+        'SpeechRecognition',
     ],
     cmdclass={
         'test': Tox,

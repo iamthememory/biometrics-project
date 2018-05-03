@@ -1,8 +1,9 @@
+*.egg-info/
 *.pyc
 .coverage.*
 .eggs/
 .tox/
 __pycache__
 build/
+data.json
 dist/
-*.egg-info/
