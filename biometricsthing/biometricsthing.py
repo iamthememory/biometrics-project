@@ -112,7 +112,7 @@ def createuser():
     ).json()
 
     if d['responseCode'] != 'SUCC':
-        raise ValueError('Failed to create user')
+        raise sys.exit('Failed to create user')
 
     return d['userId']
 
@@ -202,7 +202,7 @@ def enrollface(
 
     if r['responseCode'] != 'SUCC':
         print(r)
-        raise ValueError('Failed to enroll user: %s' % r['message'])
+        raise sys.exit('Failed to enroll user: %s' % r['message'])
     else:
         print('Successfully enrolled face!')
         print(' - Blinks: "%s"' % r['blinksCount'])
@@ -227,7 +227,7 @@ def enrollvoice(
 
     if r['responseCode'] != 'SUCC':
         print(r)
-        raise ValueError('Failed to enroll user: %s' % r['message'])
+        raise sys.exit('Failed to enroll user: %s' % r['message'])
     else:
         print('Successfully enrolled voice!')
         print(' - Text: "%s"' % r['text'])
@@ -277,7 +277,7 @@ def main():
         uname = args.create_user
 
         if data['users'].get(uname, None) is not None:
-            raise ValueError('Username already exists')
+            raise sys.exit('Username already exists')
 
         newid = createuser()
 
@@ -294,7 +294,7 @@ def main():
         uid = data['users'].get(uname, None)
 
         if uid is None:
-            raise ValueError('No such username')
+            raise sys.exit('No such username')
 
         # Enroll voice.
         for phrase in phrases:
@@ -314,7 +314,7 @@ def main():
         uid = data['users'].get(uname, None)
 
         if uid is None:
-            raise ValueError('No such username')
+            raise sys.exit('No such username')
 
         # Verify voice.
         with tempfile.NamedTemporaryFile(mode='w+b') as f:
