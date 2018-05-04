@@ -76,8 +76,10 @@ class Tox(TestCommand):
         sys.exit(errno)
 
 authors = ', '.join([
-    'FIXME-NAME <email.fixme>',
     'Alexandria Corkwell <acorkwel@kent.edu>',
+    'Justin Boey <jboey@kent.edu>',
+    'Paul Thiese <pthiese@kent.edu>',
+    'Brian Carothers <bcarothe@kent.edu>',
 ])
 
 # Build the long description from the README and CHANGELOG.
